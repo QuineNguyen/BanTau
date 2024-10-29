@@ -80,13 +80,6 @@ public class MatchRoom {
 
     //check player name đã tồn tại
     public User checkUser(String username,String password) {
-//        for (Player player : connectedPlayers) {
-//            if (name.equals(player.getPlayerName())) {
-//                return true;
-//            }
-//        }
-//        return false;
-    	// goi data base
     	return userDAO.verifyUser(username, password);
     }
 

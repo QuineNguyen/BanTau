@@ -36,7 +36,7 @@ public class Player extends Thread {
         this.socket = socket;
         this.matchRoom = matchRoom;
         this.requestList = new HashMap<>();
-        GenerateKey();
+        
         matchRoom.addPlayer(this);
         System.out.println(">> " + socket.getRemoteSocketAddress().toString() + " " + Constants.NotificationCode.PLAYER_CONNECTED + " " + "connected");
     }
@@ -117,6 +117,7 @@ public class Player extends Thread {
                             		name = user.getUsername();
                             		score = user.getScore();
                             		username = user.getUsername();
+                            		setKey();
                             		System.out.println(">> " + socket.getRemoteSocketAddress().toString() + " " + Constants.NotificationCode.NAME_ACCEPTED + " ten la:" + name);
                             		writeNotification(Constants.NotificationCode.NAME_ACCEPTED);
                             		matchRoom.sendMatchRoomList();
@@ -249,15 +250,15 @@ public class Player extends Thread {
     }
 
     //set own key cho player
-    public void GenerateKey() {
-        StringBuilder keyBuilder = new StringBuilder();
-        Random random = new Random();
-        int length = ALPHABET.length();
-        for (int i = 0; i < 10; ++i) {
-            keyBuilder.append(ALPHABET.charAt(random.nextInt(length)));
-        }
-        String key = keyBuilder.toString();
-        this.ownKey = key;
+    public void setKey() {
+//        StringBuilder keyBuilder = new StringBuilder();
+//        Random random = new Random();
+//        int length = ALPHABET.length();
+//        for (int i = 0; i < 10; ++i) {
+//            keyBuilder.append(ALPHABET.charAt(random.nextInt(length)));
+//        }
+//        String key = keyBuilder.toString();
+        this.ownKey = username;
     }
 
     public String getOwnKey() {
