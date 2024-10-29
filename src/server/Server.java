@@ -14,7 +14,7 @@ public class Server {
     public Server(int portNumber) {
         try {
             ServerSocket serverSocket = new ServerSocket(portNumber);
-            System.out.println("SERVER ĐANG CHẠY Ở CỔNG: " + portNumber);
+            System.out.println("SERVER IS RUNNING ON PORT: " + portNumber);
             MatchRoom matchRoom = new MatchRoom();
             while (true) {
                 new Player(serverSocket.accept(), matchRoom).start();

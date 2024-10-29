@@ -96,35 +96,78 @@ public class WaitingRoomView extends JFrame {
     private void createNickname() {
         String message = "Nhập nickname của bạn.";
         while (true) {
-        	String username = (String) JOptionPane.showInputDialog(this, "nhap user name",
-                    "Tên người dùng", JOptionPane.PLAIN_MESSAGE, null, null, "");
-            // Input password (with masking)'
-            String password = (String) JOptionPane.showInputDialog(this, "nhap password",
-                    "Mật khẩu", JOptionPane.PLAIN_MESSAGE, null, null, "");
-            message = username;
-            // Send the username and password to the client
-            this.client.sendName(username, password);
-            synchronized (client) {
-                try {
-                    if (client.getNameState() == Client.NameState.WAITING) {
-                        client.wait();
-                    }
-                } catch (InterruptedException e) {
-                    e.printStackTrace();
+            JPanel panel = new JPanel();
+            panel.setLayout(new BoxLayout(panel, BoxLayout.Y_AXIS));
+            panel.setBackground(new Color(230, 240, 250)); // Màu nền nhạt cho toàn bộ panel
+    
+            // Tên người dùng
+            JTextField usernameField = new JTextField(10);
+            JLabel usernameLabel = new JLabel("Tên người dùng:");
+            usernameLabel.setFont(new Font("Arial", Font.BOLD, 14));
+            usernameField.setFont(new Font("Arial", Font.PLAIN, 14));
+    
+            // Khoảng cách và màu sắc cho label và field
+            panel.add(usernameLabel);
+            panel.add(Box.createRigidArea(new Dimension(0, 5)));
+            panel.add(usernameField);
+            panel.add(Box.createRigidArea(new Dimension(0, 10))); // Thêm khoảng cách giữa các thành phần
+    
+            // Mật khẩu
+            JPasswordField passwordField = new JPasswordField(10);
+            JLabel passwordLabel = new JLabel("Mật khẩu:");
+            passwordLabel.setFont(new Font("Arial", Font.BOLD, 14));
+            passwordField.setFont(new Font("Arial", Font.PLAIN, 14));
+    
+            panel.add(passwordLabel);
+            panel.add(Box.createRigidArea(new Dimension(0, 5)));
+            panel.add(passwordField);
+            panel.add(Box.createRigidArea(new Dimension(0, 10)));
+    
+            // Tùy chọn hiển thị hộp thoại với nút OK và Cancel
+            UIManager.put("OptionPane.okButtonText", "Đăng nhập");
+            UIManager.put("OptionPane.cancelButtonText", "Hủy");
+    
+            // Hiển thị hộp thoại
+            int option = JOptionPane.showConfirmDialog(this, panel, message, 
+                    JOptionPane.OK_CANCEL_OPTION, JOptionPane.PLAIN_MESSAGE);
+    
+            if (option == JOptionPane.OK_OPTION) {
+                String username = usernameField.getText();
+                String password = new String(passwordField.getPassword());
+    
+                if (username.isEmpty() || password.isEmpty()) {
+                    JOptionPane.showMessageDialog(this, "Vui lòng nhập cả tên người dùng và mật khẩu.");
+                    continue;
                 }
+    
+                this.client.sendName(username, password);
+    
+                synchronized (client) {
+                    try {
+                        if (client.getNameState() == Client.NameState.WAITING) {
+                            client.wait();
+                        }
+                    } catch (InterruptedException e) {
+                        e.printStackTrace();
+                    }
+                }
+    
+                Client.NameState state = client.getNameState();
+                if (state == Client.NameState.ACCEPTED) {
+                    client.setOwnName(username);
+                    break;
+                } else if (state == Client.NameState.INVALID) {
+                    message = "Nickname không hợp lệ, thử lại.";
+                } else if (state == Client.NameState.TAKEN) {
+                    message = "Nickname đã tồn tại, thử lại.";
+                }
+            } else {
+                System.exit(0);
             }
-            Client.NameState state = client.getNameState();
-            if (state == Client.NameState.ACCEPTED) {
-                client.setOwnName(username);
-                
-            } else if (state == Client.NameState.INVALID) {
-                message = "Nickname không hợp lệ.";
-            } else if (state == Client.NameState.TAKEN) {
-                message = "Nickname đã tồn tại, thử lại.";
-            }
-            break;
         }
     }
+    
+    
 
     public boolean playerNameExists(String name) {
         boolean exists = false;
