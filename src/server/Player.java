@@ -22,6 +22,8 @@ public class Player extends Thread {
     public Socket socket;
     private MatchRoom matchRoom;
     private String name = "";
+    private String score = "";
+    private String username ="";
     private ObjectOutputStream out;
     private ObjectInputStream in;
     private Game game;
@@ -109,10 +111,12 @@ public class Player extends Thread {
 //                                    writeNotification(Constants.NotificationCode.NAME_ACCEPTED);
 //                                    matchRoom.sendMatchRoomList();
 //                                }
-                            	if(user != null) {
+                            	if(user != null){
                             		
                             		System.out.println(user.toString());
-                            		name = user.getUsername() + " " + user.getScore() +"diem";
+                            		name = user.getUsername();
+                            		score = user.getScore();
+                            		username = user.getUsername();
                             		System.out.println(">> " + socket.getRemoteSocketAddress().toString() + " " + Constants.NotificationCode.NAME_ACCEPTED + " ten la:" + name);
                             		writeNotification(Constants.NotificationCode.NAME_ACCEPTED);
                             		matchRoom.sendMatchRoomList();
@@ -177,7 +181,12 @@ public class Player extends Thread {
     public String getPlayerName() {
         return name;
     }
-
+    public String getPlayerScore() {
+    	return score;
+    }
+    public String getPlayerUsername() {
+    	return username;
+    }
     //gui mess đến 1 client
     public void writeMessage(String message) {
         try {

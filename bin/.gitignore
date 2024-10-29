@@ -1,5 +1,4 @@
-/client/
-/dao/
-/model/
 /server/
-/util/
+/client/
+/model/
+/dao/

@@ -21,27 +21,6 @@ public class UserDAO extends DAO {
         super();
     }
 
-//    public User verifyUser(User user) {
-//        try {
-//            PreparedStatement preparedStatement = con.prepareStatement("SELECT *\n"
-//                    + "FROM user\n"
-//                    + "WHERE username = ?\n"
-//                    + "AND password = ?"
-//            );
-//            preparedStatement.setString(1, user.getUsername());
-//            preparedStatement.setString(2, user.getPassword());
-//            ResultSet rs = preparedStatement.executeQuery();
-//            if (rs.next()) {
-//                return new User(rs.getString(1),
-//                        rs.getString(2),
-//                        rs.getString(3));
-//            }
-//
-//        } catch (SQLException e) {
-//            e.printStackTrace();
-//        }
-//        return null;
-//    }
     public User verifyUser(String username,String password) {
         try {
             PreparedStatement preparedStatement = con.prepareStatement("SELECT *\n"
@@ -63,6 +42,26 @@ public class UserDAO extends DAO {
         }
         return null;
     }
+    public void updateUserScore(String username) {
+        try {
+            // Prepare the SQL statement to update the score
+            PreparedStatement preparedStatement = con.prepareStatement(
+                "UPDATE user SET score = score + 1 WHERE username = ?"
+            );
+            preparedStatement.setString(1, username);
+
+            // Execute the update
+            int rowsUpdated = preparedStatement.executeUpdate();
+            if (rowsUpdated > 0) {
+                System.out.println("Score updated successfully for user: " + username);
+            } else {
+                System.out.println("No user found with the username: " + username);
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+    }
+
     public void addUser(User user) {
         try {
             PreparedStatement preparedStatement = con.prepareStatement("INSERT INTO user(username, password, score)\n"

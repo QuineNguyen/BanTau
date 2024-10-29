@@ -92,11 +92,12 @@ public class MatchRoom {
 
     //gui danh sach cách player khác trong sảnh chờ cho tất cả người chơi
     public synchronized void sendMatchRoomList() {
-        HashMap<String, String> matchRoomList = new HashMap<String, String>();
+        HashMap<String, String[]> matchRoomList = new HashMap<String, String[]>();
         for (Map.Entry<String, Player> entry : waitingPlayerList.entrySet()) {
             String key = entry.getKey();
             Player player = entry.getValue();
-            matchRoomList.put(key, player.getPlayerName());
+            matchRoomList.put(key, new String[] {player.getPlayerName(), player.getPlayerScore()});
+
         }
         MatchRoomListMessage message = new MatchRoomListMessage(matchRoomList);
         for (Map.Entry<String, Player> entry : waitingPlayerList.entrySet()) {
