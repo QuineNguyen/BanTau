@@ -6,13 +6,13 @@ import java.util.HashMap;
 // Object gửi client chứa danh sách các người chơi đang phòng chờ
 public class MatchRoomListMessage implements Serializable {
 
-    private HashMap<String, String> matchRoomList;
+    private HashMap<String, String[]> matchRoomList;
 
-    public MatchRoomListMessage(HashMap<String, String> matchRoomList) {
-        this.matchRoomList = matchRoomList;
+    public MatchRoomListMessage(HashMap<String, String[]> matchRoomList2) {
+        this.matchRoomList = matchRoomList2;
     }
 
-    public HashMap<String, String> getMatchRoomList() {
+    public HashMap<String, String[]> getMatchRoomList() {
         return this.matchRoomList;
     }
 

@@ -126,7 +126,7 @@ public class Client extends Thread {
     private void parseInput(Object input) {
 
         if (input instanceof MatchRoomListMessage) {
-            final HashMap<String, String> matchRoomList = ((MatchRoomListMessage) input).getMatchRoomList();
+            final HashMap<String, String[]> matchRoomList = ((MatchRoomListMessage) input).getMatchRoomList();
             waitingRoomView.updateWaitingList(matchRoomList);
         } else if (input instanceof NotificationMessage) {
             NotificationMessage n = (NotificationMessage) input;

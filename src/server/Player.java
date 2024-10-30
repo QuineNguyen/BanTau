@@ -22,6 +22,8 @@ public class Player extends Thread {
     public Socket socket;
     private MatchRoom matchRoom;
     private String name = "";
+    private int score = 0;
+    private String username ="";
     private ObjectOutputStream out;
     private ObjectInputStream in;
     private Game game;
@@ -34,7 +36,7 @@ public class Player extends Thread {
         this.socket = socket;
         this.matchRoom = matchRoom;
         this.requestList = new HashMap<>();
-        GenerateKey();
+        
         matchRoom.addPlayer(this);
         System.out.println(">> " + socket.getRemoteSocketAddress().toString() + " " + Constants.NotificationCode.PLAYER_CONNECTED + " " + "connected");
     }
@@ -95,24 +97,34 @@ public class Player extends Thread {
                                 break;
                             //đặt tên nickname
                             case "name":
-                                // Kiểm tra người dùng trong cơ sở dữ liệu
-                                User user = matchRoom.checkUser(array[1], array[2]);
-                                if (user != null) {  // Người dùng tồn tại
-                                    // Kiểm tra xem tên đã được sử dụng bởi người chơi khác chưa
-                                    if (matchRoom.playerNameExists(user.getUsername())) {
-                                        System.out.println(">> " + socket.getRemoteSocketAddress().toString() + " " + Constants.NotificationCode.NAME_TAKEN + " " + user.getUsername());
-                                        writeNotification(Constants.NotificationCode.NAME_TAKEN);  // Tên đã được sử dụng
-                                    } else {
-                                        // Đăng nhập thành công, đặt tên người dùng
-                                        name = user.getUsername() + " " + user.getScore() + " điểm";
-                                        System.out.println(">> " + socket.getRemoteSocketAddress().toString() + " " + Constants.NotificationCode.NAME_ACCEPTED + " tên là: " + name);
-                                        writeNotification(Constants.NotificationCode.NAME_ACCEPTED);
-                                        matchRoom.sendMatchRoomList();
-                                    }
-                                } else {
-                                    // Người dùng không tồn tại trong cơ sở dữ liệu
-                                    writeNotification(Constants.NotificationCode.INVALID_NAME);
-                                }
+                            	User user = matchRoom.checkUser(array[1],array[2]);
+//                                System.out.println("<< " + socket.getRemoteSocketAddress().toString() + " " + Constants.NotificationCode.NAME_REQUEST + " " + array[1]);
+//                                if (length != 2 || array[1] == null || array[1].equals("")) {
+//                                    System.out.println(">> " + socket.getRemoteSocketAddress().toString() + " " + Constants.NotificationCode.INVALID_NAME + " ");
+//                                    writeNotification(Constants.NotificationCode.INVALID_NAME);
+//                                } else if (matchRoom.playerNameExists(array[1])) {
+//                                    System.out.println(">> " + socket.getRemoteSocketAddress().toString() + " " + Constants.NotificationCode.NAME_TAKEN + " " + array[1]);
+//                                    writeNotification(Constants.NotificationCode.NAME_TAKEN);
+//                                } else {
+//                                    name = array[1];
+//                                    System.out.println(">> " + socket.getRemoteSocketAddress().toString() + " " + Constants.NotificationCode.NAME_ACCEPTED + " " + name);
+//                                    writeNotification(Constants.NotificationCode.NAME_ACCEPTED);
+//                                    matchRoom.sendMatchRoomList();
+//                                }
+                            	if(user != null){
+                            		
+                            		System.out.println(user.toString());
+                            		name = user.getUsername();
+                            		score = user.getScore();
+                            		username = user.getUsername();
+                            		setKey();
+                            		System.out.println(">> " + socket.getRemoteSocketAddress().toString() + " " + Constants.NotificationCode.NAME_ACCEPTED + " ten la:" + name);
+                            		writeNotification(Constants.NotificationCode.NAME_ACCEPTED);
+                            		matchRoom.sendMatchRoomList();
+                            	}else {
+                            		writeNotification(Constants.NotificationCode.INVALID_NAME);
+                            	}
+                      
                                 break;
                         }
                     }
@@ -170,7 +182,15 @@ public class Player extends Thread {
     public String getPlayerName() {
         return name;
     }
-
+    public int getPlayerScore() {
+    	return score;
+    }
+    public String getPlayerUsername() {
+    	return username;
+    }
+    public void plusScore(){
+        score = score + 1;
+    }
     //gui mess đến 1 client
     public void writeMessage(String message) {
         try {
@@ -233,15 +253,15 @@ public class Player extends Thread {
     }
 
     //set own key cho player
-    public void GenerateKey() {
-        StringBuilder keyBuilder = new StringBuilder();
-        Random random = new Random();
-        int length = ALPHABET.length();
-        for (int i = 0; i < 10; ++i) {
-            keyBuilder.append(ALPHABET.charAt(random.nextInt(length)));
-        }
-        String key = keyBuilder.toString();
-        this.ownKey = key;
+    public void setKey() {
+//        StringBuilder keyBuilder = new StringBuilder();
+//        Random random = new Random();
+//        int length = ALPHABET.length();
+//        for (int i = 0; i < 10; ++i) {
+//            keyBuilder.append(ALPHABET.charAt(random.nextInt(length)));
+//        }
+//        String key = keyBuilder.toString();
+        this.ownKey = username;
     }
 
     public String getOwnKey() {

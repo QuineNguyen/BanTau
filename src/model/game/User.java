@@ -4,13 +4,13 @@ public class User {
 	private int id;
     private String username;
     private String password;
-    private String score;
+    private int score;
     private String status;
 
     // Constructors, getters, and setters
     public User() {}
 
-    public User(String username, String password, String score) {
+    public User(String username, String password, int score) {
         this.username = username;
         this.password = password;
         this.score = score;
@@ -27,6 +27,6 @@ public class User {
     public String getPassword() { return password; }
     public void setPassword(String password) { this.password = password; }
 
-    public String getScore() { return score; }
-    public void setScore(String score) { this.score = score; }
+    public int getScore() { return score; }
+    public void setScore(int score) { this.score = score; }
 }

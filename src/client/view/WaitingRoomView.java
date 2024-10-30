@@ -1,26 +1,24 @@
+
+
 package client.view;
 
 import client.Client;
 
 import javax.swing.*;
 import javax.swing.border.EmptyBorder;
-import javax.swing.event.ListSelectionEvent;
-import javax.swing.event.ListSelectionListener;
+import javax.swing.table.DefaultTableModel;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.awt.event.MouseAdapter;
-import java.awt.event.MouseEvent;
 import java.util.HashMap;
-import java.util.Map;
+import java.util.Map.Entry;
 
 public class WaitingRoomView extends JFrame {
 
     private Client client;
-    private DefaultListModel<RoomPlayer> playersListModel = new DefaultListModel<RoomPlayer>();
-    private boolean firstTimeListing = true;
-    private HashMap<String, String> waitingList;
-    private JList<RoomPlayer> playersList;
+    private HashMap<String, String[]> waitingList;
+    private JTable playersTable;
+    private DefaultTableModel tableModel;
     private JButton sendInvite;
     private JLabel playersNumber;
 
@@ -37,14 +35,16 @@ public class WaitingRoomView extends JFrame {
         setTitle("Game tàu chiến");
         mainPanel.setBorder(new EmptyBorder(5, 5, 5, 5));
     
-        playersList = new JList<>();
-        playersList.setModel(playersListModel);
-        playersList.setBackground(new Color(230, 240, 250));
-        playersList.setSelectionBackground(new Color(200, 220, 240)); // Màu nền khi chọn
-        playersList.setSelectionForeground(Color.BLACK); // Màu chữ khi chọn
-        playersList.addMouseListener(new PlayersListMouseAdapter());
-        playersList.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
-        
+        // Initialize the table model and playersTable
+        tableModel = new DefaultTableModel(new Object[]{ "Tên", "Điểm"}, 0) {
+            @Override
+            public boolean isCellEditable(int row, int column) {
+                return false; // Make cells non-editable
+            }
+        };
+        playersTable = new JTable(tableModel);
+        playersTable.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
+    
         sendInvite = new JButton("Gửi thách đấu");
         sendInvite.setEnabled(false);
         sendInvite.setBackground(new Color(200, 220, 240)); // Màu nền cho nút
@@ -52,24 +52,21 @@ public class WaitingRoomView extends JFrame {
         sendInvite.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                RoomPlayer player = playersList.getSelectedValue();
-                client.sendJoinGameRequest(player.getKey(), player.getName());
+                int selectedRow = playersTable.getSelectedRow();
+                if (selectedRow != -1) {
+                    // String key = (String) tableModel.getValueAt(selectedRow, 0);
+                    String name = (String) tableModel.getValueAt(selectedRow, 0);
+                    client.sendJoinGameRequest(name, name);
+                }
             }
         });
     
-        playersList.addListSelectionListener(new ListSelectionListener() {
-            @Override
-            public void valueChanged(ListSelectionEvent e) {
-                sendInvite.setEnabled(true);
-            }
-        });
-    
-        playersNumber = new JLabel("Người chơi trong sảnh: " + playersListModel.getSize());
+        playersNumber = new JLabel("Người chơi trong sảnh: 0");
         playersNumber.setHorizontalAlignment(JLabel.CENTER);
         playersNumber.setForeground(new Color(60, 60, 60)); // Màu chữ cho JLabel
     
         mainPanel.add(playersNumber, BorderLayout.NORTH);
-        mainPanel.add(new JScrollPane(playersList), BorderLayout.CENTER);
+        mainPanel.add(new JScrollPane(playersTable), BorderLayout.CENTER);
         mainPanel.add(sendInvite, BorderLayout.SOUTH);
     
         add(mainPanel, BorderLayout.CENTER);
@@ -82,33 +79,19 @@ public class WaitingRoomView extends JFrame {
         client.joinLobby();
     
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+    
+        playersTable.getSelectionModel().addListSelectionListener(e -> {
+            sendInvite.setEnabled(playersTable.getSelectedRow() != -1);
+        });
     }
     
-
-    private class PlayersListMouseAdapter extends MouseAdapter {
-
-        public void mouseClicked(MouseEvent e) {
-            if (e.getClickCount() != 2) {
-                return;
-            }
-
-            RoomPlayer player = playersList.getSelectedValue();
-
-            if (player != null) {
-                client.sendJoinGameRequest(player.getKey(), player.getName());
-            }
-        }
-
-    }
-
     private void createNickname() {
         String message = "Nhập nickname của bạn.";
         while (true) {
             JPanel panel = new JPanel();
             panel.setLayout(new BoxLayout(panel, BoxLayout.Y_AXIS));
-            panel.setBackground(new Color(230, 240, 250)); // Màu nền nhạt cho toàn bộ panel
+            panel.setBackground(new Color(230, 240, 250)); // Màu nền cho panel
     
-            // Tên người dùng
             JTextField usernameField = new JTextField(10);
             JLabel usernameLabel = new JLabel("Tên người dùng:");
             usernameLabel.setFont(new Font("Arial", Font.BOLD, 14));
@@ -120,7 +103,6 @@ public class WaitingRoomView extends JFrame {
             panel.add(usernameField);
             panel.add(Box.createRigidArea(new Dimension(0, 10)));
     
-            // Mật khẩu
             JPasswordField passwordField = new JPasswordField(10);
             JLabel passwordLabel = new JLabel("Mật khẩu:");
             passwordLabel.setFont(new Font("Arial", Font.BOLD, 14));
@@ -132,14 +114,12 @@ public class WaitingRoomView extends JFrame {
             panel.add(passwordField);
             panel.add(Box.createRigidArea(new Dimension(0, 10)));
     
-            // Tùy chọn hiển thị hộp thoại với nút OK và Cancel
-            UIManager.put("OptionPane.background", new Color(230, 240, 250)); // Đặt màu nền cho toàn bộ JOptionPane
-            UIManager.put("Panel.background", new Color(230, 240, 250)); // Đặt màu nền cho Panel bên trong JOptionPane
+            UIManager.put("OptionPane.background", new Color(230, 240, 250));
+            UIManager.put("Panel.background", new Color(230, 240, 250));
             UIManager.put("OptionPane.okButtonText", "Đăng nhập");
             UIManager.put("OptionPane.cancelButtonText", "Hủy");
     
-            // Hiển thị hộp thoại
-            int option = JOptionPane.showConfirmDialog(this, panel, message, 
+            int option = JOptionPane.showConfirmDialog(this, panel, message,
                     JOptionPane.OK_CANCEL_OPTION, JOptionPane.PLAIN_MESSAGE);
     
             if (option == JOptionPane.OK_OPTION) {
@@ -168,7 +148,7 @@ public class WaitingRoomView extends JFrame {
                     client.setOwnName(username);
                     break;
                 } else if (state == Client.NameState.INVALID) {
-                    message = "Nickname không hợp lệ, thử lại.";
+                    message = "Tài khoản hoặc mật khẩu không đúng, thử lại.";
                 } else if (state == Client.NameState.TAKEN) {
                     message = "Nickname đã tồn tại, thử lại.";
                 }
@@ -177,49 +157,36 @@ public class WaitingRoomView extends JFrame {
             }
         }
     }
-    
-    
 
-    public boolean playerNameExists(String name) {
-        boolean exists = false;
-        for (Map.Entry<String, String> entry : waitingList.entrySet()) {
-            if (entry.getValue().equals(name)) {
-                return true;
-            }
-        }
-        return exists;
-    }
+    public synchronized void updateWaitingList(HashMap<String, String[]> matchRoomList) {
+        this.waitingList = matchRoomList;
+        tableModel.setRowCount(0);
 
-    public synchronized void updateWaitingList(HashMap<String, String> waitingList) {
-        this.waitingList = waitingList;
-        this.playersListModel.clear();
-        for (Map.Entry<String, String> entry : waitingList.entrySet()) {
+        for (Entry<String, String[]> entry : matchRoomList.entrySet()) {
             String key = entry.getKey();
             if (!key.equals(client.getKey())) {
-                String name = entry.getValue();
-                RoomPlayer player = new RoomPlayer(key, name);
-                this.playersListModel.addElement(player);
+                String[] data = entry.getValue();
+                String name = data[0];
+                String score = data[1];
+                tableModel.addRow(new Object[] {name, score});
             }
         }
-        if (playersList.isSelectionEmpty()) {
-            sendInvite.setEnabled(false);
-        }
-        playersNumber.setText("Người chơi trong sảnh: " + playersListModel.getSize());
+
+        playersNumber.setText("Người chơi trong sảnh: " + tableModel.getRowCount());
     }
 
     public static void main(String[] args) {
         new WaitingRoomView();
     }
-
     private class RoomPlayer {
 
         private String key;
         private String name;
         private String score;
-        public RoomPlayer(String key, String name) {
+        public RoomPlayer(String key, String name,String score) {
             this.key = key;
             this.name = name;
-            this.score = "0";
+            this.score = score;
         }
 
         public String toString() {
@@ -232,6 +199,9 @@ public class WaitingRoomView extends JFrame {
 
         public String getName() {
             return this.name;
+        }
+        public String getScore() {
+        	return this.score;
         }
 
     }
