@@ -12,6 +12,8 @@ import java.util.Random;
 import java.util.Timer;
 import java.util.TimerTask;
 
+import dao.UserDAO;
+
 import static util.Constants.Configs.*;
 import static util.Constants.NotificationCode.*;
 
@@ -134,6 +136,8 @@ public class Game {
             System.out.println(">> " + opponent.socket.getRemoteSocketAddress().toString() + " " + Constants.NotificationCode.SHOT + " " + x + " " + y);
 
             if (opponent.getBoard().gameOver()) {
+            	new UserDAO().updateUserScore(player.getPlayerUsername()); // update điểm
+                player.plusScore();
                 System.out.println(">> " + turn.socket.getRemoteSocketAddress().toString() + " " + Constants.NotificationCode.GAME_WIN);
                 turn.writeNotification(Constants.NotificationCode.GAME_WIN);
 
