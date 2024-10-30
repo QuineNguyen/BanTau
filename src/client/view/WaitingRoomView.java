@@ -31,17 +31,24 @@ public class WaitingRoomView extends JFrame {
         } catch (Exception e) {
             e.printStackTrace();
         }
-
+    
         JPanel mainPanel = new JPanel(new BorderLayout(10, 5));
+        mainPanel.setBackground(new Color(230, 240, 250)); // Đặt màu nền cho mainPanel
         setTitle("Game tàu chiến");
         mainPanel.setBorder(new EmptyBorder(5, 5, 5, 5));
-
+    
         playersList = new JList<>();
         playersList.setModel(playersListModel);
+        playersList.setBackground(new Color(230, 240, 250));
+        playersList.setSelectionBackground(new Color(200, 220, 240)); // Màu nền khi chọn
+        playersList.setSelectionForeground(Color.BLACK); // Màu chữ khi chọn
         playersList.addMouseListener(new PlayersListMouseAdapter());
         playersList.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
+        
         sendInvite = new JButton("Gửi thách đấu");
         sendInvite.setEnabled(false);
+        sendInvite.setBackground(new Color(200, 220, 240)); // Màu nền cho nút
+        sendInvite.setForeground(Color.BLACK); // Màu chữ cho nút
         sendInvite.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
@@ -49,33 +56,34 @@ public class WaitingRoomView extends JFrame {
                 client.sendJoinGameRequest(player.getKey(), player.getName());
             }
         });
-
-
+    
         playersList.addListSelectionListener(new ListSelectionListener() {
             @Override
             public void valueChanged(ListSelectionEvent e) {
                 sendInvite.setEnabled(true);
             }
         });
-
+    
         playersNumber = new JLabel("Người chơi trong sảnh: " + playersListModel.getSize());
         playersNumber.setHorizontalAlignment(JLabel.CENTER);
-
+        playersNumber.setForeground(new Color(60, 60, 60)); // Màu chữ cho JLabel
+    
         mainPanel.add(playersNumber, BorderLayout.NORTH);
         mainPanel.add(new JScrollPane(playersList), BorderLayout.CENTER);
         mainPanel.add(sendInvite, BorderLayout.SOUTH);
-
+    
         add(mainPanel, BorderLayout.CENTER);
         setVisible(true);
         setLocationRelativeTo(null);
         pack();
-
+    
         this.client = new Client(this);
         createNickname();
         client.joinLobby();
-
+    
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
     }
+    
 
     private class PlayersListMouseAdapter extends MouseAdapter {
 
@@ -104,18 +112,19 @@ public class WaitingRoomView extends JFrame {
             JTextField usernameField = new JTextField(10);
             JLabel usernameLabel = new JLabel("Tên người dùng:");
             usernameLabel.setFont(new Font("Arial", Font.BOLD, 14));
+            usernameLabel.setForeground(new Color(60, 60, 60)); // Màu chữ
             usernameField.setFont(new Font("Arial", Font.PLAIN, 14));
     
-            // Khoảng cách và màu sắc cho label và field
             panel.add(usernameLabel);
             panel.add(Box.createRigidArea(new Dimension(0, 5)));
             panel.add(usernameField);
-            panel.add(Box.createRigidArea(new Dimension(0, 10))); // Thêm khoảng cách giữa các thành phần
+            panel.add(Box.createRigidArea(new Dimension(0, 10)));
     
             // Mật khẩu
             JPasswordField passwordField = new JPasswordField(10);
             JLabel passwordLabel = new JLabel("Mật khẩu:");
             passwordLabel.setFont(new Font("Arial", Font.BOLD, 14));
+            passwordLabel.setForeground(new Color(60, 60, 60)); // Màu chữ
             passwordField.setFont(new Font("Arial", Font.PLAIN, 14));
     
             panel.add(passwordLabel);
@@ -124,6 +133,8 @@ public class WaitingRoomView extends JFrame {
             panel.add(Box.createRigidArea(new Dimension(0, 10)));
     
             // Tùy chọn hiển thị hộp thoại với nút OK và Cancel
+            UIManager.put("OptionPane.background", new Color(230, 240, 250)); // Đặt màu nền cho toàn bộ JOptionPane
+            UIManager.put("Panel.background", new Color(230, 240, 250)); // Đặt màu nền cho Panel bên trong JOptionPane
             UIManager.put("OptionPane.okButtonText", "Đăng nhập");
             UIManager.put("OptionPane.cancelButtonText", "Hủy");
     

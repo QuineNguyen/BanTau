@@ -48,6 +48,7 @@ public class UserDAO extends DAO {
                     + "FROM user\n"
                     + "WHERE username = ?\n"
                     + "AND password = ?"
+                    + "AND status = 'offline'"
             );
             preparedStatement.setString(1, username);
             preparedStatement.setString(2, password);
@@ -63,6 +64,22 @@ public class UserDAO extends DAO {
         }
         return null;
     }
+
+    // public boolean modifyStatus(String username, String status) {
+    //     try {
+    //         PreparedStatement preparedStatement = con.prepareStatement(
+    //             "UPDATE user SET status = ? WHERE username = ?"
+    //         );
+    //         preparedStatement.setString(1, status);
+    //         preparedStatement.setString(2, username);
+    //         int rowsUpdated = preparedStatement.executeUpdate();
+    //         return rowsUpdated > 0;  // Trả về true nếu cập nhật thành công
+    //     } catch (SQLException e) {
+    //         e.printStackTrace();
+    //     }
+    //     return false;  // Trả về false nếu cập nhật không thành công
+    // }
+    
     public void addUser(User user) {
         try {
             PreparedStatement preparedStatement = con.prepareStatement("INSERT INTO user(username, password, score)\n"

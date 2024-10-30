@@ -90,6 +90,16 @@ public class MatchRoom {
     	return userDAO.verifyUser(username, password);
     }
 
+    public boolean playerNameExists(String name) {
+        for (Player player : connectedPlayers) {
+            if (name.equals(player.getPlayerName())) {
+                return true;
+            }
+        }
+        return false;
+    }
+    
+
     //gui danh sach cách player khác trong sảnh chờ cho tất cả người chơi
     public synchronized void sendMatchRoomList() {
         HashMap<String, String> matchRoomList = new HashMap<String, String>();
@@ -117,4 +127,7 @@ public class MatchRoom {
         connectedPlayers.remove(player);
     }
 
+    public UserDAO getUserDAO() {
+        return userDAO;
+    }
 }
