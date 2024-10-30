@@ -95,31 +95,24 @@ public class Player extends Thread {
                                 break;
                             //đặt tên nickname
                             case "name":
-                            	User user = matchRoom.checkUser(array[1],array[2]);
-//                                System.out.println("<< " + socket.getRemoteSocketAddress().toString() + " " + Constants.NotificationCode.NAME_REQUEST + " " + array[1]);
-//                                if (length != 2 || array[1] == null || array[1].equals("")) {
-//                                    System.out.println(">> " + socket.getRemoteSocketAddress().toString() + " " + Constants.NotificationCode.INVALID_NAME + " ");
-//                                    writeNotification(Constants.NotificationCode.INVALID_NAME);
-//                                } else if (matchRoom.playerNameExists(array[1])) {
-//                                    System.out.println(">> " + socket.getRemoteSocketAddress().toString() + " " + Constants.NotificationCode.NAME_TAKEN + " " + array[1]);
-//                                    writeNotification(Constants.NotificationCode.NAME_TAKEN);
-//                                } else {
-//                                    name = array[1];
-//                                    System.out.println(">> " + socket.getRemoteSocketAddress().toString() + " " + Constants.NotificationCode.NAME_ACCEPTED + " " + name);
-//                                    writeNotification(Constants.NotificationCode.NAME_ACCEPTED);
-//                                    matchRoom.sendMatchRoomList();
-//                                }
-                            	if(user != null) {
-                            		
-                            		System.out.println(user.toString());
-                            		name = user.getUsername() + " " + user.getScore() +"diem";
-                            		System.out.println(">> " + socket.getRemoteSocketAddress().toString() + " " + Constants.NotificationCode.NAME_ACCEPTED + " ten la:" + name);
-                            		writeNotification(Constants.NotificationCode.NAME_ACCEPTED);
-                            		matchRoom.sendMatchRoomList();
-                            	}else {
-                            		writeNotification(Constants.NotificationCode.NAME_TAKEN);
-                            	}
-                      
+                                // Kiểm tra người dùng trong cơ sở dữ liệu
+                                User user = matchRoom.checkUser(array[1], array[2]);
+                                if (user != null) {  // Người dùng tồn tại
+                                    // Kiểm tra xem tên đã được sử dụng bởi người chơi khác chưa
+                                    if (matchRoom.playerNameExists(user.getUsername())) {
+                                        System.out.println(">> " + socket.getRemoteSocketAddress().toString() + " " + Constants.NotificationCode.NAME_TAKEN + " " + user.getUsername());
+                                        writeNotification(Constants.NotificationCode.NAME_TAKEN);  // Tên đã được sử dụng
+                                    } else {
+                                        // Đăng nhập thành công, đặt tên người dùng
+                                        name = user.getUsername() + " " + user.getScore() + " điểm";
+                                        System.out.println(">> " + socket.getRemoteSocketAddress().toString() + " " + Constants.NotificationCode.NAME_ACCEPTED + " tên là: " + name);
+                                        writeNotification(Constants.NotificationCode.NAME_ACCEPTED);
+                                        matchRoom.sendMatchRoomList();
+                                    }
+                                } else {
+                                    // Người dùng không tồn tại trong cơ sở dữ liệu
+                                    writeNotification(Constants.NotificationCode.INVALID_NAME);
+                                }
                                 break;
                         }
                     }
