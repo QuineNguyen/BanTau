@@ -7,6 +7,7 @@ public class Constants {
     public static class Configs {
         public static final int PORT_NUMBER = 6969;
         // public static final String HOST_NAME = "26.64.248.188";
+//        public static final String HOST_NAME = "26.36.9.179";
         public static final String HOST_NAME = "localhost";
         public static final int BOARD_DIMENSION = 10;
 
@@ -15,6 +16,7 @@ public class Constants {
     }
 
     public static class NotificationCode {
+        public static final int REQUEST_PLAYER_LIST = 5;
         public final static int PLACE_SHIPS = 101;
         public final static int YOUR_TURN = 102;
         public final static int OPPONENTS_TURN = 103;

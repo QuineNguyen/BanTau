@@ -110,8 +110,8 @@ public class UserDAO extends DAO {
     }
     
 
-    public List<User> getAllUsers() throws SQLException {
-        List<User> users = new ArrayList<>();
+    public ArrayList<User> getAllUsers() throws SQLException {
+        ArrayList<User> users = new ArrayList<>();
         String sql = "SELECT * FROM user ORDER BY score DESC";
         PreparedStatement statement = con.prepareStatement(sql);
         ResultSet resultSet = statement.executeQuery();
@@ -123,7 +123,7 @@ public class UserDAO extends DAO {
             user.setStatus(resultSet.getString("status"));
             users.add(user);
         }
-
+        System.out.println(users.size());
         return users;
     }
 

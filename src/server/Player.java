@@ -5,16 +5,19 @@ import model.game.User;
 import model.messages.ChatMessage;
 import model.messages.MoveMessage;
 import model.messages.NotificationMessage;
+import model.messages.PlayerListMessage;
 import util.Constants;
 
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.net.Socket;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Random;
 
+import client.view.FriendListView;
 import dao.UserDAO;
 
 import static util.Constants.ALPHABET;
@@ -33,7 +36,6 @@ public class Player extends Thread {
     private HashMap<String, Player> requestList;
     private String ownKey;
     private String requestedGameKey;
-    private UserDAO userDAO;
     public Player(Socket socket, MatchRoom matchRoom) {
         this.socket = socket;
         this.matchRoom = matchRoom;
@@ -123,6 +125,12 @@ public class Player extends Thread {
                                     // Tên đăng nhập hoặc mật khẩu sai, gửi INVALID_NAME
                                     System.out.println("Tài khoản hoặc mật khẩu không đúng, thử lại.");
                                     writeNotification(Constants.NotificationCode.INVALID_NAME);
+                                }
+                                break;
+                            case "request":
+                                if (array.length > 1 && "playerList".equals(array[1])) {
+                                    System.out.println("<< " + socket.getRemoteSocketAddress().toString() + " requesting player list");
+                                    matchRoom.sendPlayerListToClient(this); // Sends the player list to the client
                                 }
                                 break;
 
@@ -250,6 +258,9 @@ public class Player extends Thread {
         requestedGameKey = null;
         System.out.println(">> " + socket.getRemoteSocketAddress().toString() + " " + Constants.NotificationCode.JOIN_GAME_REQUEST_REJECTED + " " + this.ownKey);
         writeNotification(Constants.NotificationCode.JOIN_GAME_REQUEST_REJECTED);
+    }
+    public void requestPlayerList() {
+        writeNotification(Constants.NotificationCode.REQUEST_PLAYER_LIST);
     }
 
     //set own key cho player

@@ -11,16 +11,16 @@ import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.sql.SQLException;
+import java.util.ArrayList;
 import java.util.List;
 
 public class FriendListView extends JFrame {
-    private Client client;
     private JTable friendsTable;
     private DefaultTableModel tableModel;
     private JButton backButton;
+    ArrayList<User> playerList;
+    public FriendListView(ArrayList<User> playerList) {
 
-    public FriendListView(Client client) {
-        this.client = client;
 
         try {
             UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
@@ -49,8 +49,8 @@ public class FriendListView extends JFrame {
         friendsTable.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
         JScrollPane tableScrollPane = new JScrollPane(friendsTable);
 
-        loadFriendData();
-
+        // loadFriendData();
+        updatePlayerList(playerList);
         mainPanel.add(tableScrollPane, BorderLayout.CENTER);
 
         // Back button setup
@@ -64,18 +64,15 @@ public class FriendListView extends JFrame {
         setVisible(true);
     }
 
-    // Load friend data from UserDAO and display in table
-    private void loadFriendData() {
-        UserDAO userDAO = new UserDAO();
-        try {
-            List<User> users = userDAO.getAllUsers();
-            tableModel.setRowCount(0);
-            for (User user : users) {
-                tableModel.addRow(new Object[]{user.getUsername(), user.getScore(), user.getStatus()});
-            }
-        } catch (SQLException e) {
-            e.printStackTrace();
-            JOptionPane.showMessageDialog(this, "Lỗi khi tải danh sách bạn bè.", "Lỗi", JOptionPane.ERROR_MESSAGE);
+
+    public void updatePlayerList(ArrayList<User> playerList) {
+        // Xóa tất cả các hàng hiện có trước khi thêm dữ liệu mới
+        tableModel.setRowCount(0);
+        
+        for (User user : playerList) {
+            tableModel.addRow(new Object[]{user.getUsername(), user.getScore(), user.getStatus()});
+            System.out.println("Username: " + user.getUsername() + ", Score: " + user.getScore());
         }
     }
+
 }

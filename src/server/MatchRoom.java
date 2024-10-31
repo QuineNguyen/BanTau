@@ -2,15 +2,21 @@ package server;
 
 import model.game.User;
 import model.messages.MatchRoomListMessage;
+import model.messages.PlayerListMessage;
 import util.Constants;
 
+import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
+
+import dao.ArayList;
 import dao.UserDAO;
 public class MatchRoom {
 	UserDAO userDAO = new UserDAO();
     private HashMap<String, Player> waitingPlayerList;
+    
     private ArrayList<Player> connectedPlayers;
 
     public MatchRoom() {
@@ -109,7 +115,24 @@ public class MatchRoom {
             player.writeObject(message);
         }
     }
+    public synchronized void sendPlayerListToClient(Player player) {
+        // Fetch player list from DAO
+        ArrayList<User> playerList;
+        try {
+            playerList = userDAO.getAllUsers();
+                    // Create a message to send to client
+        PlayerListMessage message = new PlayerListMessage(playerList);
+        
+        // Send message to the specific player (client)
+        player.writeObject(message);
+        System.out.println("gưi playlist den server gom co : " + playerList.size());
+        } catch (SQLException e) {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
+        } // Assuming getAllPlayers() returns a list of User objects
 
+    }
+    
     //thêm player vào danh sách đã kết nối phong chờ
     public void addPlayer(Player player) {
         if (!connectedPlayers.contains(player)) {

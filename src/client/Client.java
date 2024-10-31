@@ -4,13 +4,16 @@ import client.view.GameView;
 import client.view.InviteReceivedPane;
 import client.view.InviteSentPane;
 import client.view.WaitingRoomView;
+import model.game.User;
 import model.messages.MatchRoomListMessage;
 import model.messages.NotificationMessage;
+import model.messages.PlayerListMessage;
 import util.Constants;
 
 import java.awt.*;
 import java.io.*;
 import java.net.Socket;
+import java.util.ArrayList;
 import java.util.HashMap;
 
 import static util.Constants.Configs.HOST_NAME;
@@ -96,7 +99,10 @@ public class Client extends Thread {
             e.printStackTrace();
         }
     }
-
+    public void sendPlayerListRequest() throws IOException {
+        System.out.println(">> Requesting player list");
+		sendStringArray(new String[]{"request", "playerList"});
+    }
     public void sendName(String username,String password) {
         this.nameState = NameState.WAITING;
         System.out.println(">> " + Constants.NotificationCode.NAME_REQUEST + " " + username);
@@ -186,6 +192,14 @@ public class Client extends Thread {
                         System.out.println("can't find " + n.getText()[0]);
                     }
             }
+        }else if (input instanceof PlayerListMessage) {
+            // Handle PlayerListMessage
+            PlayerListMessage playerListMessage = (PlayerListMessage) input;
+            ArrayList<User> playerList = playerListMessage.getPlayerList();
+            
+            // Update the WaitingRoomView with the player list
+            waitingRoomView.updatePlayerList(playerList);
+            System.out.println("<< Received player list with " + playerList.size() + " players.");
         }
     }
 

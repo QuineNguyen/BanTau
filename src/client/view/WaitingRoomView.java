@@ -1,7 +1,7 @@
 package client.view;
 
 import client.Client;
-import dao.UserDAO;
+import model.game.User;
 
 import javax.swing.*;
 import javax.swing.border.EmptyBorder;
@@ -9,6 +9,8 @@ import javax.swing.table.DefaultTableModel;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.io.IOException;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map.Entry;
 
@@ -16,6 +18,7 @@ public class WaitingRoomView extends JFrame {
 
     private Client client;
     private HashMap<String, String[]> waitingList;
+    private ArrayList<User> playerList;
     private JTable playersTable;
     private DefaultTableModel tableModel;
     private JButton sendInvite;
@@ -67,7 +70,14 @@ public class WaitingRoomView extends JFrame {
         friendListButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                new FriendListView(client); // Mở giao diện FriendListView
+            	try {
+					client.sendPlayerListRequest();
+				
+				} catch (IOException e1) {
+					// TODO Auto-generated catch block
+					e1.printStackTrace();
+				}
+               // Mở giao diện FriendListView
             }
         });
 
@@ -238,4 +248,14 @@ public class WaitingRoomView extends JFrame {
                 JOptionPane.ERROR_MESSAGE);
         System.exit(-1);
     }
+
+	public void updatePlayerList(ArrayList<User> playerList2) {
+		// TODO Auto-generated method stub
+		playerList = playerList2;
+		System.out.println("so luong user trong db " +  playerList.size());
+		if(playerList.size() >2) {
+			new FriendListView(playerList);
+		}
+		
+	}
 }
