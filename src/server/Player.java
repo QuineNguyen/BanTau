@@ -15,6 +15,8 @@ import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Random;
 
+import dao.UserDAO;
+
 import static util.Constants.ALPHABET;
 
 
@@ -31,7 +33,7 @@ public class Player extends Thread {
     private HashMap<String, Player> requestList;
     private String ownKey;
     private String requestedGameKey;
-
+    private UserDAO userDAO;
     public Player(Socket socket, MatchRoom matchRoom) {
         this.socket = socket;
         this.matchRoom = matchRoom;
@@ -97,35 +99,33 @@ public class Player extends Thread {
                                 break;
                             //đặt tên nickname
                             case "name":
-                            	User user = matchRoom.checkUser(array[1],array[2]);
-//                                System.out.println("<< " + socket.getRemoteSocketAddress().toString() + " " + Constants.NotificationCode.NAME_REQUEST + " " + array[1]);
-//                                if (length != 2 || array[1] == null || array[1].equals("")) {
-//                                    System.out.println(">> " + socket.getRemoteSocketAddress().toString() + " " + Constants.NotificationCode.INVALID_NAME + " ");
-//                                    writeNotification(Constants.NotificationCode.INVALID_NAME);
-//                                } else if (matchRoom.playerNameExists(array[1])) {
-//                                    System.out.println(">> " + socket.getRemoteSocketAddress().toString() + " " + Constants.NotificationCode.NAME_TAKEN + " " + array[1]);
-//                                    writeNotification(Constants.NotificationCode.NAME_TAKEN);
-//                                } else {
-//                                    name = array[1];
-//                                    System.out.println(">> " + socket.getRemoteSocketAddress().toString() + " " + Constants.NotificationCode.NAME_ACCEPTED + " " + name);
-//                                    writeNotification(Constants.NotificationCode.NAME_ACCEPTED);
-//                                    matchRoom.sendMatchRoomList();
-//                                }
-                            	if(user != null){
-                            		
-                            		System.out.println(user.toString());
-                            		name = user.getUsername();
-                            		score = user.getScore();
-                            		username = user.getUsername();
-                            		setKey();
-                            		System.out.println(">> " + socket.getRemoteSocketAddress().toString() + " " + Constants.NotificationCode.NAME_ACCEPTED + " ten la:" + name);
-                            		writeNotification(Constants.NotificationCode.NAME_ACCEPTED);
-                            		matchRoom.sendMatchRoomList();
-                            	}else {
-                            		writeNotification(Constants.NotificationCode.INVALID_NAME);
-                            	}
-                      
+                                // Kiểm tra thông tin đăng nhập của người dùng
+                                User user = matchRoom.checkUser(array[1], array[2]);
+
+                                if (user != null) {
+                                    if (matchRoom.getUserDAO().modifyStatus(user.getUsername(), "online")) {
+                                        // Cập nhật trạng thái online và chấp nhận đăng nhập
+                                        name = user.getUsername();
+                                        score = user.getScore();
+                                        username = user.getUsername();
+                                        setKey();
+                                        System.out.println(">> " + socket.getRemoteSocketAddress().toString() + " " + Constants.NotificationCode.NAME_ACCEPTED + " tên là: " + name);
+                                        writeNotification(Constants.NotificationCode.NAME_ACCEPTED);
+                                        matchRoom.sendMatchRoomList();
+                                    }
+                                } 
+                                else if (matchRoom.getUserDAO().checkDuplicated(array[1])) {
+                                    // Nếu tên đăng nhập đã tồn tại và đang online, gửi NAME_TAKEN
+                                    System.out.println(">> " + socket.getRemoteSocketAddress().toString() + " " + Constants.NotificationCode.NAME_TAKEN + " Nickname đã tồn tại, thử lại!");
+                                    writeNotification(Constants.NotificationCode.NAME_TAKEN);
+                                } 
+                                else {
+                                    // Tên đăng nhập hoặc mật khẩu sai, gửi INVALID_NAME
+                                    System.out.println("Tài khoản hoặc mật khẩu không đúng, thử lại.");
+                                    writeNotification(Constants.NotificationCode.INVALID_NAME);
+                                }
                                 break;
+
                         }
                     }
                 } else if (input instanceof Board) {

@@ -79,7 +79,7 @@ public class UserDAO extends DAO {
 
     public boolean checkDuplicated(String username) {
         try {
-            PreparedStatement preparedStatement = con.prepareStatement("SELECT * FROM user WHERE username = ?");
+            PreparedStatement preparedStatement = con.prepareStatement("SELECT * FROM user WHERE username = ? AND status = 'online'");
             preparedStatement.setString(1, username);
             System.out.println(preparedStatement);
             ResultSet rs = preparedStatement.executeQuery();
@@ -93,20 +93,34 @@ public class UserDAO extends DAO {
         return false;
     }
 
-
+    
+    public boolean modifyStatus(String username, String status) {
+        try {
+            PreparedStatement preparedStatement = con.prepareStatement(
+                "UPDATE user SET status = ? WHERE username = ?"
+            );
+            preparedStatement.setString(1, status);
+            preparedStatement.setString(2, username);
+            int rowsUpdated = preparedStatement.executeUpdate();
+            return rowsUpdated > 0;  // Trả về true nếu cập nhật thành công
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return false;  // Trả về false nếu cập nhật không thành công
+    }
+    
 
     public List<User> getAllUsers() throws SQLException {
         List<User> users = new ArrayList<>();
-        String sql = "SELECT * FROM users ORDER BY score DESC";
+        String sql = "SELECT * FROM user ORDER BY score DESC";
         PreparedStatement statement = con.prepareStatement(sql);
         ResultSet resultSet = statement.executeQuery();
 
         while (resultSet.next()) {
             User user = new User();
-            user.setId(resultSet.getInt("id"));
             user.setUsername(resultSet.getString("username"));
-            user.setPassword(resultSet.getString("password"));
             user.setScore(resultSet.getInt("score"));
+            user.setStatus(resultSet.getString("status"));
             users.add(user);
         }
 

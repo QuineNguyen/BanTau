@@ -10,13 +10,20 @@ public class User {
     // Constructors, getters, and setters
     public User() {}
 
+    public User(String username, String password, int score, String status) {
+        this.username = username;
+        this.password = password;
+        this.score = score;
+        this.status = status;
+    }
+    
     public User(String username, String password, int score) {
         this.username = username;
         this.password = password;
         this.score = score;
     }
     public String toString() {
-    	return "username: " + this.username + " password: " + this.password;
+    	return "username: " + this.username + " password: " + this.password + " score: " + this.score + " status: " + this.status;
     }
     public int getId() { return id; }
     public void setId(int id) { this.id = id; }
@@ -29,4 +36,12 @@ public class User {
 
     public int getScore() { return score; }
     public void setScore(int score) { this.score = score; }
+
+    public String getStatus() {
+        return status;
+    }
+
+    public void setStatus(String status) {
+        this.status = status;
+    }
 }

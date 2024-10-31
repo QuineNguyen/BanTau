@@ -74,6 +74,7 @@ public class MatchRoom {
     //remove player trong waitting room
     //Gửi lại danh sách chờ cho các player còn lại
     public synchronized void removeWaitingPlayer(Player player) {
+        userDAO.modifyStatus(player.getPlayerUsername(),"offline");
         waitingPlayerList.values().remove(player);
         sendMatchRoomList();
     }
